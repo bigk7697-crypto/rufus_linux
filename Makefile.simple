@@ -1,0 +1,73 @@
+# Simple Makefile for Rufus Linux (Windows/WSL compatible)
+
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c11 -O2
+DEBUG_CFLAGS = -Wall -Wextra -std=c11 -g -DDEBUG
+
+# Include directories
+INCLUDES = -Iinclude
+
+# Libraries
+LIBS = -lusb-1.0 -lblkid -lpthread -lssl -lcrypto -lm
+
+# Source files
+CORE_SOURCES = src/core/usb_detect.c src/core/disk_access.c src/core/iso_write.c src/core/verification.c src/core/security.c src/core/filesystem.c src/core/ui.c
+CLI_SOURCES = src/cli/main.c
+ALL_SOURCES = $(CORE_SOURCES) $(CLI_SOURCES)
+
+# Object files
+OBJECTS = $(ALL_SOURCES:.c=.o)
+
+# Target executable
+TARGET = rufus-linux
+
+# Default target
+all: $(TARGET)
+
+# Debug build
+debug: CFLAGS = $(DEBUG_CFLAGS)
+debug: $(TARGET)
+
+# Build executable
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(TARGET) $(LIBS)
+
+# Compile source files
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+# Clean build artifacts
+clean:
+	del /Q *.o $(TARGET).exe 2>nul || rm -f *.o $(TARGET)
+
+# Install (Linux only)
+install: $(TARGET)
+	sudo cp $(TARGET) /usr/local/bin/
+
+# Test commands
+test: $(TARGET)
+	@echo "=== Testing USB Detection ==="
+	./$(TARGET) --help
+	@echo ""
+	./$(TARGET) --version
+	@echo ""
+	./$(TARGET) --list-usb
+
+# Check dependencies
+check-deps:
+	@echo "Checking dependencies..."
+	@pkg-config --exists libusb-1.0 && echo "✓ libusb-1.0 found" || echo "✗ libusb-1.0 missing"
+	@which gcc > /dev/null && echo "✓ gcc found" || echo "✗ gcc missing"
+
+# Show help
+help:
+	@echo "Available targets:"
+	@echo "  all        - Build the executable"
+	@echo "  debug      - Build with debug symbols"
+	@echo "  clean      - Remove build artifacts"
+	@echo "  install    - Install to /usr/local/bin"
+	@echo "  test       - Run basic tests"
+	@echo "  check-deps - Check dependencies"
+	@echo "  help       - Show this help"
+
+.PHONY: all debug clean install test check-deps help

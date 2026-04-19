@@ -1,0 +1,58 @@
+# Build artifacts
+build/
+bin/
+*.o
+*.exe
+*.deb
+*.d
+
+# Dependencies
+*.so
+*.a
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+*.audit
+
+# Backup files
+*.bak
+*.backup
+mbr_backup_*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package directories
+rufus-linux-package/
+
+# WSL files
+*.wsl
+
+# Windows specific
+*.bat
+*.cmd
+
+# Documentation build
+docs/*.html
+docs/*.pdf
+
+# Test files
+test_*
+*_test.*
+
+# Security files
+.rufus.log
+.rufus_audit.log
